@@ -43,7 +43,8 @@ int main(int argc, char *const *argv)
     float t;                    /* retinex threshold */
     size_t nx, ny, nc;          /* image size */
     size_t channel, nc_non_alpha;
-    float *data, *data_rtnx;
+    float *data, *data_rtnx, *data_shdng;
+    unsigned int i, c;
 
     /* "-v" option : version info */
     if (2 <= argc && 0 == strcmp("-v", argv[1])) {
@@ -51,8 +52,8 @@ int main(int argc, char *const *argv)
         return EXIT_SUCCESS;
     }
     /* wrong number of parameters : simple help info */
-    if (4 != argc) {
-        fprintf(stderr, "usage : %s T in.png rtnx.png\n", argv[0]);
+    if (5 != argc) {
+        fprintf(stderr, "usage : %s T in.png rtnx.png shdng.png\n", argv[0]);
         fprintf(stderr, "        T retinex threshold [0,1[\n");
         return EXIT_FAILURE;
     }
@@ -79,7 +80,15 @@ int main(int argc, char *const *argv)
         return EXIT_FAILURE;
     }
     memcpy(data_rtnx, data, nc * nx * ny * sizeof(float));
-
+    
+    /* allocate data_shdng */
+    if (NULL == (data_shdng = (float *) malloc(nc * nx * ny * sizeof(float)))) {
+        fprintf(stderr, "allocation error: data_shdng\n");
+        free(data);
+        free(data_rtnx);
+        return EXIT_FAILURE;
+    }
+    
     /* the image has either 1 or 3 non-alpha channels */
     if (3 <= nc)
         nc_non_alpha = 3;
@@ -100,11 +109,21 @@ int main(int argc, char *const *argv)
         normalize_mean_dt(data_rtnx + channel * nx * ny,
                           data + channel * nx * ny, nx * ny);
     }
+    
+    /* Get shading from retinex image.*/
+    for (i = 0; i < nx*ny; ++i) {
+        for (c = 0; c < nc; ++c) {
+            data_shdng[i + nx*ny*c] = data[i + nx*ny*c] - data_rtnx[i + nx*ny*c];
+        }
+    }
+    
     DBG_CLOCK_TOGGLE(0);
+    io_png_write_flt(argv[4], data_shdng, nx, ny, nc);
     io_png_write_flt(argv[3], data_rtnx, nx, ny, nc);
     DBG_CLOCK_TOGGLE(0);
     DBG_PRINTF1("io\t%0.2fs\n", DBG_CLOCK_S(0));
 
+    free(data_shdng);
     free(data_rtnx);
     free(data);
 
