@@ -17,7 +17,7 @@ COPT	= -O2
 # complete C compiler options
 CFLAGS	= $(COPT)
 # preprocessor options
-CPPFLAGS	= -I. -DNDEBUG
+CPPFLAGS	= -I.
 # linker options
 LDFLAGS	=
 # libraries

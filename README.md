@@ -10,10 +10,10 @@ Using Ubuntu, the code can be compiled using the shipped `makefile` after instal
 
     sudo apt-get install fftw3-dev
     sudo apt-get install libpng-dev
-    
-In addition, the `makefile` need to be adapted in order to link against `libm`. Adapt the following line:
 
-    LDFLAGS	+= -lm -lpng -lfftw3f
+To suppress the debug information, adapt `makefile` as follows:
+
+    CPPFLAGS	= -I. -DNDEBUG
 
 **Tip:** Some basic documentation of io_png can be found on GitHub: [https://github.com/nilx/io_png](https://github.com/nilx/io_png).
 

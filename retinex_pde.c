@@ -100,14 +100,20 @@ int main(int argc, char *const *argv)
      * normalize mean and standard deviation and save
      */
     for (channel = 0; channel < nc_non_alpha; channel++) {
+        DBG_PRINTF1("---- CHANNEL %zd\n", channel);
+        DBG_CLOCK_START(1);
         if (NULL == retinex_pde(data_rtnx + channel * nx * ny, nx, ny, t)) {
             fprintf(stderr, "the retinex PDE failed\n");
             free(data_rtnx);
             free(data);
             return EXIT_FAILURE;
         }
+        DBG_PRINTF1("retinex_pde\t%0.3fs\n", DBG_CLOCK_S(1));
+        
+        DBG_CLOCK_RESET(1);
         normalize_mean_dt(data_rtnx + channel * nx * ny,
                           data + channel * nx * ny, nx * ny);
+        DBG_PRINTF1("normalization\t%0.3fs\n", DBG_CLOCK_S(1));
     }
     
     /* Get shading from retinex image.*/
@@ -121,7 +127,9 @@ int main(int argc, char *const *argv)
     io_png_write_flt(argv[4], data_shdng, nx, ny, nc);
     io_png_write_flt(argv[3], data_rtnx, nx, ny, nc);
     DBG_CLOCK_TOGGLE(0);
-    DBG_PRINTF1("io\t%0.2fs\n", DBG_CLOCK_S(0));
+    
+    DBG_PRINTF0("---- IO\n");
+    DBG_PRINTF1("io\t\t%0.3fs\n", DBG_CLOCK_S(0));
 
     free(data_shdng);
     free(data_rtnx);

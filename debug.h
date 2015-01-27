@@ -50,15 +50,15 @@
  * DBG_PRINTF2("i=%i, j=%i\n", i, j);
  */
 #define DBG_PRINTF0(STR) \
-    { fprintf(stderr, STR); }
+    { fprintf(stdout, STR); }
 #define DBG_PRINTF1(STR, A1) \
-    { fprintf(stderr, STR, A1); }
+    { fprintf(stdout, STR, A1); }
 #define DBG_PRINTF2(STR, A1, A2) \
-    { fprintf(stderr, STR, A1, A2); }
+    { fprintf(stdout, STR, A1, A2); }
 #define DBG_PRINTF3(STR, A1, A2, A3) \
-    { fprintf(stderr, STR, A1, A2, A3); }
+    { fprintf(stdout, STR, A1, A2, A3); }
 #define DBG_PRINTF4(STR, A1, A2, A3, A4) \
-    { fprintf(stderr, STR, A1, A2, A3, A4); }
+    { fprintf(stdout, STR, A1, A2, A3, A4); }
 
 #else
 

@@ -343,9 +343,9 @@ float *retinex_pde(float *data, size_t nx, size_t ny, float t)
     fftwf_cleanup_threads();
 #endif                          /* FFTW_NTHREADS */
 
-    DBG_PRINTF1("laplace\t%0.2fs\n", DBG_CLOCK_S(LAPLACE));
-    DBG_PRINTF1("poisson\t%0.2fs\n", DBG_CLOCK_S(POISSON));
-    DBG_PRINTF1("fourier\t%0.2fs\n", DBG_CLOCK_S(FOURIER));
+    DBG_PRINTF1("laplace\t\t%0.2fs\n", DBG_CLOCK_S(LAPLACE));
+    DBG_PRINTF1("poisson\t\t%0.2fs\n", DBG_CLOCK_S(POISSON));
+    DBG_PRINTF1("fourier\t\t%0.2fs\n", DBG_CLOCK_S(FOURIER));
 
     return data;
 }
