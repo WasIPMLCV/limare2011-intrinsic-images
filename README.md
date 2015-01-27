@@ -8,31 +8,24 @@ This is a fork of the code provided at [http://www.ipol.im/pub/art/2011/lmps_rpe
 
 Using Ubuntu, the code can be compiled using CMake after installing the required dependecies:
 
+    $ sudo apt-get install build-essential
     $ sudo apt-get install cmake
     $ sudo apt-get install fftw3-dev
     $ sudo apt-get install libpng-dev
+    $ sudo apt-get install libboost-all-dev
 
-To compile the code, use CMake:
+For the installation of OpenCV, see [http://docs.opencv.org/doc/tutorials/introduction/linux_install/linux_install.html#linux-installation](http://docs.opencv.org/doc/tutorials/introduction/linux_install/linux_install.html#linux-installation).
+
+To compile the code using CMake:
 
     $ cd limare2011-intrinsic-images
     $ cmake .
     $ make
-    [ 25%] Building C object CMakeFiles/io_png.dir/io_png.c.o
-    Linking C static library libio_png.a
-    [ 25%] Built target io_png
-    [ 50%] Building C object CMakeFiles/retinex_pde.dir/retinex_pde_lib.c.o
-    Linking C static library libretinex_pde.a
-    [ 50%] Built target retinex_pde
-    [ 75%] Building C object CMakeFiles/retinex_pde_cli.dir/retinex_pde.c.o
-    [100%] Building C object CMakeFiles/retinex_pde_cli.dir/norm.c.o
-    Linking C executable retinex_pde_cli
-    [100%] Built target retinex_pde_cli
 
-To suppress the debug information, adapt add the `-NDEBUG` flag.
-
-Use the created command line interface as follows:
+Two command line tools will be compiled: the original one, and one based on OpenCV and Boost:
 
     ./retinex_pde_cli T in.png rtnx.png shdng.png
+    ./retinex_pde_opencv in.png T
 
 **Tip:** Some basic documentation of io_png can be found on GitHub: [https://github.com/nilx/io_png](https://github.com/nilx/io_png).
 
@@ -78,7 +71,7 @@ Multi-threading is possible, with the FFTW_NTHREADS parameter:
 
 This program takes ~~4~~5 parameters: `retinex_pde T in.png rtnx.png shdng.png`
 
-* `T`: retinex threshold [0...1[
+* `T`: retinex threshold (0,1]
 * `in.png`: input image
 * `rtnx.png`: retinex output image
 * `shdng.png`: shading output image

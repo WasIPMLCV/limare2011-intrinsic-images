@@ -274,9 +274,10 @@ static float *retinex_poisson_dct(float *data, size_t nx, size_t ny, double m)
  */
 float *retinex_pde(float *data, size_t nx, size_t ny, float t)
 {
+    int i;
     fftwf_plan dct_fw, dct_bw;
     float *data_fft, *data_tmp;
-
+    
     DBG_CLOCK_RESET(LAPLACE);
     DBG_CLOCK_RESET(POISSON);
     DBG_CLOCK_RESET(FOURIER);
@@ -346,6 +347,6 @@ float *retinex_pde(float *data, size_t nx, size_t ny, float t)
     DBG_PRINTF1("laplace\t\t%0.2fs\n", DBG_CLOCK_S(LAPLACE));
     DBG_PRINTF1("poisson\t\t%0.2fs\n", DBG_CLOCK_S(POISSON));
     DBG_PRINTF1("fourier\t\t%0.2fs\n", DBG_CLOCK_S(FOURIER));
-
+    
     return data;
 }

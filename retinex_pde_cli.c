@@ -54,7 +54,7 @@ int main(int argc, char *const *argv)
     /* wrong number of parameters : simple help info */
     if (5 != argc) {
         fprintf(stderr, "usage : %s T in.png rtnx.png shdng.png\n", argv[0]);
-        fprintf(stderr, "        T retinex threshold [0,1[\n");
+        fprintf(stderr, "        T retinex threshold (0,1]\n");
         return EXIT_FAILURE;
     }
 
