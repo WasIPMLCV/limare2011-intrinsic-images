@@ -20,18 +20,21 @@ namespace retinex {
      * 
      * @param image
      * @param threshold
+     * @param reflectance
      * @return 
      */
-    cv::Mat RetinexPDE(const cv::Mat& image, float threshold);
+    void RetinexPDE(const cv::Mat& image, float threshold, cv::Mat* reflectance);
     
     /**
      * Given the reflectance image from RetinexPDE, the shading can be determined
      * base don the original image.
      * 
+     * @param image
      * @param reflectance
+     * @param shading
      * @return 
      */
-    cv::Mat RetinexPDE_Shading(const cv::Mat& image, const cv::Mat& reflectance);
+    void RetinexPDE_Shading(const cv::Mat& image, const cv::Mat& reflectance, cv::Mat* shading);
 }
 
 #endif	/* RETINEX_PDE_LIB_WRAPPER_H */

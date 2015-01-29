@@ -47,8 +47,11 @@ int main(int argc, char** argv) {
     }
     
     cv::Mat image = cv::imread(inputFile.string());
-    cv::Mat reflectance = retinex::RetinexPDE(image, threshold);
-    cv::Mat shading = retinex::RetinexPDE_Shading(image, reflectance);
+    cv::Mat reflectance(image.rows, image.cols, CV_8UC3);
+    retinex::RetinexPDE(image, threshold, &reflectance);
+    
+    cv::Mat shading(image.rows, image.cols, CV_8UC3);
+    retinex::RetinexPDE_Shading(image, reflectance, &shading);
     
     int position = inputFile.filename().string().find(inputFile.filename().extension().string());
     std::string reflectanceFile = inputFile.filename().string().substr(0, position) + "_reflectance.png";
