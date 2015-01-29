@@ -38,6 +38,8 @@ namespace retinex {
     }
     
     void RetinexPDEArray2Mat(float* array, cv::Mat& reflectance) {
+        assert(reflectance.type() == CV_8UC3);
+        
         std::size_t rows = reflectance.rows;
         std::size_t cols = reflectance.rows;
         std::size_t channels = reflectance.channels();
