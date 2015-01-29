@@ -6,9 +6,18 @@
  */
 
 #include "retinex_pde_lib_wrapper.h"
-#include "retinex_pde_lib.h"
-#include "norm.h"
 #include <cstddef>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+  #include "retinex_pde_lib.h"
+  #include "norm.h"
+#ifdef __cplusplus
+}
+#endif 
+
+
 
 namespace retinex {
     float* Mat2RetinexPDEArray(const cv::Mat mat) {
