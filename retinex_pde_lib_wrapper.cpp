@@ -20,9 +20,8 @@ extern "C" {
 
 
 namespace retinex {
-    float* Mat2RetinexPDEArray(const cv::Mat mat) {
+    float* Mat2RetinexPDEArray(float* output, const cv::Mat mat) {
         assert(mat.type() == CV_8UC3);
-        float* output = new float[mat.rows*mat.cols*mat.channels()];
         
         // Retinex PDE Lib expects a one-dimensional array where the image is
         // row by row and channel by channel.
@@ -37,32 +36,19 @@ namespace retinex {
         return output;
     }
     
-    void RetinexPDEArray2Mat(float* array, cv::Mat& reflectance) {
-        std::size_t rows = reflectance.rows;
-        std::size_t cols = reflectance.rows;
-        std::size_t channels = reflectance.channels();
-        
-        for (int c = 0; c < channels; ++c) {
-            for (int i = 0; i < rows; ++i) {
-                for (int j = 0; j < cols; ++j) {
-                    // Remember to clip to avoid overflows.
-                    reflectance.at<cv::Vec3b>(i, j)[c] = std::max(0.f, std::min(255.f, array[c*rows*cols + i*cols + j]));
-                }
-            }
-        }
-    }
-    
     void RetinexPDE(const cv::Mat& image, float threshold, cv::Mat* reflectance) {
         std::size_t rows = image.rows;
         std::size_t cols = image.cols;
         std::size_t channels = image.channels();
         
-        assert(image.type() == CV_8UC3);
+        assert(image.type() == reflectance->type() && reflectance->type() == CV_8UC3);
         assert(threshold > 0 && threshold <= 255);
         
         // Unfortunately matrices are stored differently from io_png images.
-        float* output_data = Mat2RetinexPDEArray(image);
-        float* input_data = Mat2RetinexPDEArray(image);
+        float* output_data = new float[rows*cols*channels];
+        float* input_data = new float[rows*cols*channels];
+        Mat2RetinexPDEArray(output_data, image);
+        Mat2RetinexPDEArray(input_data, image);
         
         for (std::size_t c = 0; c < channels; ++c) {
             float* success = retinex_pde(output_data + c*cols*rows, cols, rows, threshold);
@@ -75,8 +61,15 @@ namespace retinex {
             normalize_mean_dt(output_data + c*cols*rows, input_data + c*cols*rows, rows*cols);
         }
         
-        RetinexPDEArray2Mat(output_data, *reflectance);
-        cv::imwrite("test.png", *reflectance);
+        for (int i = 0; i < rows; ++i) {
+            for (int j = 0; j < cols; ++j) {
+                for (int c = 0; c < channels; ++c) {
+                    // Remember to clip to avoid overflows.
+                    reflectance->at<cv::Vec3b>(i, j)[c] = (unsigned char) std::max(0.f, std::min(255.f, output_data[c*rows*cols + i*cols + j]));
+                }
+            }
+        }
+        
         // Remember to clean up!
         delete[] output_data;
         delete[] input_data;
