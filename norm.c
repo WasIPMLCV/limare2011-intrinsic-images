@@ -28,6 +28,7 @@
 #include <math.h>
 
 #include "norm.h"
+#include "debug.h"
 
 /**
  * @brief compute mean and variance of a float array
@@ -90,6 +91,9 @@ void normalize_mean_dt(float *data, const float *ref, size_t size)
     mean_dt(ref, size, &mean_ref, &dt_ref);
     mean_dt(data, size, &mean_data, &dt_data);
 
+    DBG_PRINTF2("image mean: %f, image variance: %f\n", mean_ref, dt_ref);
+    DBG_PRINTF2("data mean: %f, data variance: %f\n", mean_data, dt_data);
+    
     /* compute the normalization coefficients */
     a = dt_ref / dt_data;
     b = mean_ref - a * mean_data;

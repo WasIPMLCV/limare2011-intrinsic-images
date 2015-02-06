@@ -256,6 +256,8 @@ static float *retinex_poisson_dct(float *data, size_t nx, size_t ny, double m)
  *
  * The input array is processed as follow:
  *
+ * Note: DFT = Discrete Fourier Transform, DCT = Discrete Cosine Transform.
+ * 
  * @li a discrete laplacian is computed with a threshold;
  * @li this discrete laplacian array is symmetrised in both directions;
  * @li this data is transformed by forward DFT (both steps can be
@@ -276,7 +278,7 @@ float *retinex_pde(float *data, size_t nx, size_t ny, float t)
 {
     int i;
     fftwf_plan dct_fw, dct_bw;
-    float *data_fft, *data_tmp;
+    float *data_tmp;
     
     DBG_CLOCK_RESET(LAPLACE);
     DBG_CLOCK_RESET(POISSON);
@@ -298,10 +300,10 @@ float *retinex_pde(float *data, size_t nx, size_t ny, float t)
     (void) discrete_laplacian_threshold(data_tmp, data, nx, ny, t);
 
     /* allocate the float-complex FFT array */
-    if (NULL == (data_fft = (float *) fftwf_malloc(sizeof(float) * nx * ny))) {
+    /* if (NULL == (data_fft = (float *) fftwf_malloc(sizeof(float) * nx * ny))) {
         fprintf(stderr, "allocation error\n");
         abort();
-    }
+    } */
 
     /* start threaded fftw if FFTW_NTHREADS is defined */
 #ifdef FFTW_NTHREADS
@@ -315,30 +317,34 @@ float *retinex_pde(float *data, size_t nx, size_t ny, float t)
     /* create the DFT forward plan and run the DCT : data_tmp -> data_fft */
     DBG_CLOCK_TOGGLE(FOURIER);
     dct_fw = fftwf_plan_r2r_2d((int) ny, (int) nx,
-                               data_tmp, data_fft,
+                               data_tmp, data_tmp,
                                FFTW_REDFT10, FFTW_REDFT10,
                                FFTW_ESTIMATE | FFTW_DESTROY_INPUT);
     fftwf_execute(dct_fw);
     DBG_CLOCK_TOGGLE(FOURIER);
-    fftwf_free(data_tmp);
+    /* fftwf_free(data_tmp); */
 
     /* solve the Poisson PDE in Fourier space */
     /* 1. / (float) (nx * ny)) is the DCT normalisation term, see libfftw */
-    (void) retinex_poisson_dct(data_fft, nx, ny, 1. / (double) (nx * ny));
+    (void) retinex_poisson_dct(data_tmp, nx, ny, 1. / (double) (nx * ny));
 
     /* create the DFT backward plan and run the iDCT : data_fft -> data */
     DBG_CLOCK_TOGGLE(FOURIER);
     dct_bw = fftwf_plan_r2r_2d((int) ny, (int) nx,
-                               data_fft, data,
+                               data_tmp, data_tmp,
                                FFTW_REDFT01, FFTW_REDFT01,
                                FFTW_ESTIMATE | FFTW_DESTROY_INPUT);
     fftwf_execute(dct_bw);
     DBG_CLOCK_TOGGLE(FOURIER);
 
+    for (i = 0; i < nx*ny; ++i) {
+      data[i] = data_tmp[i];
+    }
+    
     /* cleanup */
     fftwf_destroy_plan(dct_fw);
     fftwf_destroy_plan(dct_bw);
-    fftwf_free(data_fft);
+    /* fftwf_free(data_fft); */
     fftwf_cleanup();
 #ifdef FFTW_NTHREADS
     fftwf_cleanup_threads();
